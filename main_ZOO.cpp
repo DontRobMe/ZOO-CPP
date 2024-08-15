@@ -318,20 +318,20 @@ public:
     void achat_cages(Zoo *zoo) {
         int indice;
         for (int i = 0; i<magasin_cage.size(); i++ ){
-            cout << i+1 <<") cage de " << magasin_cage[i]->get_type() << " "<< magasin_cage[i]->get_price_buy()<< "€ capacite:"<< magasin_cage[i]->get_capacity()<<" animaux"<< endl;
+            cout << i+1 <<") cage de " << magasin_cage[i]->get_type() << " "<< magasin_cage[i]->get_price_buy()<< " capacite:"<< magasin_cage[i]->get_capacity()<<" animaux"<< endl;
         }
         cout << magasin_cage.size()+1 <<") retour"<<endl;
         indice = entree(4);
-        if (indice == '1') {
+        if (indice == 1) {
             rem_argent(zoo, magasin_cage[0]->get_price_buy());
             add_inventaire_cage((magasin_cage[0]));
-        } else if (indice == '2') {
+        } else if (indice == 2) {
             rem_argent(zoo, magasin_cage[1]->get_price_buy());
             add_inventaire_cage((magasin_cage[1]));
-        } else if (indice == '3') {
+        } else if (indice == 3) {
             rem_argent(zoo, magasin_cage[2]->get_price_buy());
             add_inventaire_cage((magasin_cage[2]));
-        } else if (indice == '4') {
+        } else if (indice == 4) {
             menu_cages(zoo);
         }
 
@@ -342,29 +342,39 @@ public:
         int indexremcage;
         cout << "1) vente cages \n2) retour" << endl;
         indice = entree(2);
-        if (indice == '1') {
+        if (indice == 1) {
             cout << "Liste des cages: " << endl;
+
+            // Affichage des cages disponibles avec leur prix de vente
             for (int i = 0; i < inventaire_cage.size(); i++) {
-                cout << i + 1 << ") cage " << inventaire_cage[i]->get_type() << endl; // a voir!
+                cout << i + 1 << ") cage " << inventaire_cage[i]->get_type()
+                     << " (Prix: " << inventaire_cage[i]->get_price_sell() << "e)" << endl;
             }
             cout << inventaire_cage.size() + 1 << ") retour" << endl;
             cout << "quelle cage vendre ? ";
-            indexremcage = entree(inventaire_cage.size() + 1) - 49;
+            indexremcage = entree(inventaire_cage.size() + 1);
+
             if (indexremcage == inventaire_cage.size() + 1) {
-                menu_cages(zoo);
-            } else if (inventaire_cage[indexremcage]->get_type() == "tigre") {
-                add_argent(zoo, magasin_cage[0]->get_price_sell());
-            } else if (inventaire_cage[indexremcage]->get_type() == "aigle") {
-                add_argent(zoo, magasin_cage[1]->get_price_sell());
-            } else if (inventaire_cage[indexremcage]->get_type() == "poule") {
-                add_argent(zoo, magasin_cage[2]->get_price_sell());
+                return;  // Retour direct au menu principal
             }
+
+            indexremcage--;  // Convertir en index basé sur zéro
+
+            int prix_vente = inventaire_cage[indexremcage]->get_price_sell();
+            add_argent(zoo, prix_vente);
+
+            // Affichage du prix de vente et de l'argent restant
+            cout << "Cage vendue pour " << prix_vente << "e. Argent restant: " << zoo->getInstance()->money << "e." << endl;
+
+            // Suppression de la cage de l'inventaire
             remCages(indexremcage);
-        } else if (indice == '2') {
-            menu_cages(zoo);
+        } else if (indice == 2) {
+            return;  // Retour direct au menu principal
         }
-        menu_cages(zoo);
     }
+
+
+
 
     void add_magasin_animal(Animal *animal) {
         magasin_animal.push_back(animal);
@@ -378,68 +388,139 @@ public:
         int indice;
         string type;
         string prenom;
-        for (int i =0; i<magasin_animal.size(); i++){
-            if (magasin_animal[i]->get_type()=="coq" || magasin_animal[i]->get_type()=="poule"){
-                cout << i+1 << ") "<< magasin_animal[i]->get_type()<<" age: ";
+
+        for (int i = 0; i < magasin_animal.size(); i++) {
+            if (magasin_animal[i]->get_type() == "coq" || magasin_animal[i]->get_type() == "poule") {
+                cout << i + 1 << ") " << magasin_animal[i]->get_type() << " age: ";
                 convertMouthtoYear(magasin_animal[i]->get_age());
-                cout << "prix: "<< magasin_animal[i]->get_price_buy()<< "e"<<endl;
-            }else{
-                cout << i+1 << ") "<< magasin_animal[i]->get_type()<< " "<<magasin_animal[i]->get_sexe() << " ,age: ";
+                cout << "prix: " << magasin_animal[i]->get_price_buy() << "e" << endl;
+            } else {
+                cout << i + 1 << ") " << magasin_animal[i]->get_type() << " " << magasin_animal[i]->get_sexe() << " ,age: ";
                 convertMouthtoYear(magasin_animal[i]->get_age());
-                cout << " mois, prix: "<< magasin_animal[i]->get_price_buy()<< "e"<<endl;
+                cout << " mois, prix: " << magasin_animal[i]->get_price_buy() << "e" << endl;
             }
         }
-        indice = entree(6);
-        rem_argent(zoo, magasin_animal[indice-1]->get_price_buy());
-        prenom = donner_prenom(magasin_animal[indice-1]->get_type());
-        if (indice == 1 || indice == 2){
-            add_inventaire_animal(new Tigre(magasin_animal[indice-1]->get_type(),prenom,magasin_animal[indice-1]->get_age(),magasin_animal[indice-1]->get_sexe(),magasin_animal[indice-1]->get_price_buy(),magasin_animal[indice-1]->get_price_sell()));
-        }else if (indice == 3 || indice == 4){
-            add_inventaire_animal(new Aigle(magasin_animal[indice-1]->get_type(),prenom,magasin_animal[indice-1]->get_age(),magasin_animal[indice-1]->get_sexe(),magasin_animal[indice-1]->get_price_buy(),magasin_animal[indice-1]->get_price_sell()));
-        }else if (indice == 5 || indice == 6){
-            add_inventaire_animal(new Poule(magasin_animal[indice-1]->get_type(),prenom,magasin_animal[indice-1]->get_age(),magasin_animal[indice-1]->get_sexe(),magasin_animal[indice-1]->get_price_buy(),magasin_animal[indice-1]->get_price_sell()));
+
+        indice = entree(6) - 0;  // Convertir le char en int
+        if (indice < 1 || indice > magasin_animal.size()) {
+            cout << "Indice invalide!" << endl;
+            return;
         }
 
+        rem_argent(zoo, magasin_animal[indice - 1]->get_price_buy());
+        prenom = donner_prenom(magasin_animal[indice - 1]->get_type());
+
+        if (indice == 1 || indice == 2) {
+            add_inventaire_animal(new Tigre(magasin_animal[indice - 1]->get_type(), prenom, magasin_animal[indice - 1]->get_age(), magasin_animal[indice - 1]->get_sexe(), magasin_animal[indice - 1]->get_price_buy(), magasin_animal[indice - 1]->get_price_sell()));
+        } else if (indice == 3 || indice == 4) {
+            add_inventaire_animal(new Aigle(magasin_animal[indice - 1]->get_type(), prenom, magasin_animal[indice - 1]->get_age(), magasin_animal[indice - 1]->get_sexe(), magasin_animal[indice - 1]->get_price_buy(), magasin_animal[indice - 1]->get_price_sell()));
+        } else if (indice == 5 || indice == 6) {
+            add_inventaire_animal(new Poule(magasin_animal[indice - 1]->get_type(), prenom, magasin_animal[indice - 1]->get_age(), magasin_animal[indice - 1]->get_sexe(), magasin_animal[indice - 1]->get_price_buy(), magasin_animal[indice - 1]->get_price_sell()));
+        }
     }
+
 
     void vente_animals(Zoo *zoo) {
         int indice;
-        int indexremanimal;
-        cout << "1) vente lion \n2) retour" << endl;
-        indice = entree(2);
+        cout << "Liste des animaux:" << endl;
+
+        // Affichage des animaux disponibles avec leur prix de vente
         for (int i = 0; i < inventaire_animal.size(); i++) {
-            cout << "Liste des animaux: " << i + 1 << ") " << inventaire_animal[i] << endl; // a voir!
+            cout << i + 1 << ") " << inventaire_animal[i]->get_type()
+                 << " - " << inventaire_animal[i]->get_name()
+                 << " (Prix: " << inventaire_animal[i]->get_price_sell() << "e)" << endl;
         }
-        if (indice == '1') {
+        cout << inventaire_animal.size() + 1 << ") retour" << endl;
+
+        // Sélection de l'animal à vendre
+        indice = entree(inventaire_animal.size() + 1);
+
+        // Vérification de l'option de retour
+        if (indice == inventaire_animal.size() + 1) {
+            return;  // Retour direct au menu principal
+        }
+
+        int indexremanimal = indice - 1;
+
+        // Vérification de la validité de l'indice
+        if (indexremanimal >= 0 && indexremanimal < inventaire_animal.size()) {
+            // Ajout de l'argent pour la vente
+            int prix_vente = inventaire_animal[indexremanimal]->get_price_sell();
+            add_argent(zoo, prix_vente);
+
+            // Affichage du prix de vente et de l'argent restant
+            cout << "Animal vendu pour " << prix_vente << "e. Argent restant: " << zoo->getInstance()->money << "e." << endl;
+
+            // Suppression de l'animal de l'inventaire
             remAnimal(indexremanimal);
-            add_argent(zoo, 800);
-        } else if (indice == '2') {
-            menu_animals(zoo);
+        } else {
+            cout << "Erreur: Indice d'animal invalide." << endl;
         }
     }
+
+
+
+
+
 
 
     int achat_viandes(Zoo *zoo) {
         int poids;
-        cout << "combien de kg de viandes voulez-vous" << endl;
-        cout << "voici votre wallet: " << zoo->money << endl;
-        cout << "le prix est 5e le kg: ";
+        const int prix_par_kg = 5; // Prix par kg en euros
+        cout << "Combien de kg de viandes voulez-vous acheter?" << endl;
+        cout << "Votre solde actuel: " << zoo->money << "e" << endl;
+        cout << "Prix: " << prix_par_kg << "e par kg" << endl;
+        cout << "Quantité (kg): ";
         cin >> poids;
-        cout << "vous avez acheter" << poids << "kg de viandes" << endl;
-        rem_argent(zoo, poids * 5);
+
+        if (poids <= 0) {
+            cout << "Quantité invalide!" << endl;
+            return 0;
+        }
+
+        int cout_total = poids * prix_par_kg;
+        if (zoo->money < cout_total) {
+            cout << "Fonds insuffisants!" << endl;
+            return 0;
+        }
+
+        rem_argent(zoo, cout_total);
         viandes += poids;
+
+        cout << "Vous avez acheté " << poids << " kg de viandes pour " << cout_total << "e." << endl;
+        cout << "Quantité actuelle de viandes: " << viandes << "kg" << endl;
+        return poids;
     }
+
 
     int achat_graines(Zoo *zoo) {
         int poids;
-        cout << "combien de kg de graines voulez-vous" << endl;
-        cout << "voici votre wallet: " << zoo->money << endl;
-        cout << "le prix est 3e le kg: ";
+        const int prix_par_kg = 3; // Prix par kg en euros
+        cout << "Combien de kg de graines voulez-vous acheter?" << endl;
+        cout << "Votre solde actuel: " << zoo->money << "e" << endl;
+        cout << "Prix: " << prix_par_kg << "e par kg" << endl;
+        cout << "Quantité (kg): ";
         cin >> poids;
-        cout << "vous avez acheter" << poids << "kg de graines" << endl;
-        rem_argent(zoo, poids * 3);
+
+        if (poids <= 0) {
+            cout << "Quantité invalide!" << endl;
+            return 0;
+        }
+
+        int cout_total = poids * prix_par_kg;
+        if (zoo->money < cout_total) {
+            cout << "Fonds insuffisants!" << endl;
+            return 0;
+        }
+
+        rem_argent(zoo, cout_total);
         graines += poids;
+
+        cout << "Vous avez acheté " << poids << " kg de graines pour " << cout_total << "e." << endl;
+        cout << "Quantité actuelle de graines: " << graines << "kg" << endl;
+        return poids;
     }
+
 
     void afficher_temps(int nbmois) {
         int real_mouth;
@@ -482,26 +563,30 @@ public:
 
     static int entree(int nb_reponse) {
         char entree;
+        int choice;
+
         cout << "entree: ";
         cin >> entree;
-        while (isdigit(entree) < 1 || isdigit(entree) > nb_reponse || isalpha(entree)) {
-            cout << "erreur entree non valid" << endl;
+
+        while (!isdigit(entree) || (choice = entree - '0') < 1 || choice > nb_reponse) {
+            cout << "erreur entree non valide" << endl;
             cout << "entree: ";
             cin >> entree;
         }
 
-        return entree;
+        return choice;
     }
+
 
     void menu_cages(Zoo *zoo) {
         int indice;
         cout << "1) achat cages \n2) vente cages\n3) retour" << endl;
         indice = entree(3);
-        if (indice == '1') {
+        if (indice == 1) {
             achat_cages(zoo);
-        } else if (indice == '2') {
+        } else if (indice == 2) {
             vente_cages(zoo);
-        } else if (indice == '3') {
+        } else if (indice == 3) {
             menu(zoo);
         }
     }
@@ -510,11 +595,11 @@ public:
         int indice;
         cout << "1) achat animals \n2) vente animals\n3) retour" << endl;
         indice = entree(3);
-        if (indice == '1') {
+        if (indice == 1) {
             achat_animals(zoo);
-        } else if (indice == '2') {
+        } else if (indice == 2) {
             vente_animals(zoo);
-        } else if (indice == '3') {
+        } else if (indice == 3) {
             menu(zoo);
         }
     }
@@ -525,11 +610,11 @@ public:
         cout << "vous avez: " << graines << "kg de graines!" << endl;
         cout << "1) achat viandes \n2) achat graines\n3) retour" << endl;
         indice = entree(3);
-        if (indice == '1') {
+        if (indice == 1) {
             achat_viandes(zoo);
-        } else if (indice == '2') {
+        } else if (indice == 2) {
             achat_graines(zoo);
-        } else if (indice == '3') {
+        } else if (indice == 3) {
             menu(zoo);
         }
     }
@@ -542,13 +627,13 @@ public:
             print_wallet(zoo);
             cout << "1) achat/vente cage \n2) achat/vente animal \n3) achat nouriture \n4) tour suivant" << endl;
             indice = entree(4);
-            if (indice == '1') {
+            if (indice == 1) {
                 menu_cages(zoo);
-            } else if (indice == '2') {
+            } else if (indice == 2) {
                 menu_animals(zoo);
-            } else if (indice == '3') {
+            } else if (indice == 3) {
                 menu_nourritures(zoo);
-            } else if (indice == '4') {
+            } else if (indice == 4) {
                 return;
             }
         }
